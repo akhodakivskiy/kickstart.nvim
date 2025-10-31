@@ -247,7 +247,8 @@ rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
+  --'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
+  'Darazaki/indent-o-matic', -- Detect tabstop and shiftwidth automatically
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -576,9 +577,6 @@ require('lazy').setup({
           -- Switch between header/source for C/C++
           map('go', '<cmd>ClangdSwitchSourceHeader<cr>', '[G]oto S[o]urce/Header')
 
-          -- Switch between header/source for C/C++
-          map('go', '<cmd>ClangdSwitchSourceHeader<cr>', '[G]oto S[o]urce/Header')
-
           -- Jump to the type of the word under your cursor.
           --  Useful when you're not sure what type a variable is and you want to see
           --  the definition of its *type*, not where it was *defined*.
@@ -599,10 +597,6 @@ require('lazy').setup({
           -- Rename the variable under your cursor.
           --  Most Language Servers support renaming across files, etc.
           map('<leader>cr', vim.lsp.buf.rename, '[R]eame')
-
-          -- WARN: This is not Goto Definition, this is Goto Declaration.
-          --  For example, in C this would take you to the header.
-          map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
           -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
           ---@param client vim.lsp.Client
@@ -702,22 +696,12 @@ require('lazy').setup({
       --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
-      local esp_idf_path = os.getenv 'IDF_PATH'
-      local clangd_opts = { vim.fn.stdpath 'data' .. '/mason/bin/clangd' }
-      if esp_idf_path then
-        clangd_opts = {
-          '/Users/anton/.espressif/tools/esp-clang/esp-18.1.2_20240912/esp-clang/bin/clangd',
-          '--query-driver=**',
-        }
-      end
 
       local servers = {
-        clangd = {
-          cmd = clangd_opts,
-        },
+        -- clangd = {},
         -- gopls = {},
         pyright = {},
-        rust_analyzer = {},
+        -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -742,6 +726,18 @@ require('lazy').setup({
           },
         },
       }
+
+      local esp_idf_path = os.getenv 'IDF_PATH'
+      if esp_idf_path then
+        -- servers['clangd'] = nil
+        require('lspconfig').clangd.setup {
+          cmd = {
+            os.getenv 'HOME' .. '/.espressif/tools/esp-clang/esp-18.1.2_20240912/esp-clang/bin/clangd',
+            '--enable-config',
+            '--query-driver=**',
+          },
+        }
+      end
 
       -- Ensure the servers and tools above are installed
       --
@@ -772,6 +768,8 @@ require('lazy').setup({
             -- by the server configuration above. Useful when disabling
             -- certain features of an LSP (for example, turning off formatting for ts_ls)
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            print(server_name)
+            print(server)
             require('lspconfig')[server_name].setup(server)
           end,
         },

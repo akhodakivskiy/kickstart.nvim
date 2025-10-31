@@ -19,33 +19,32 @@ return {
       },
     },
     adapters = {
-      anthropic = function()
-        return require('codecompanion.adapters').extend('anthropic', {
-          env = {
-            api_key = os.getenv("ANTHROPIC_KEY"),
-          },
-        })
-      end,
-      ollama = function()
-        return require('codecompanion.adapters').extend('ollama', {
-          schema = {
-            model = {
-              default = 'qwen3:14b',
+      http = {
+        anthropic = function()
+          return require('codecompanion.adapters').extend('anthropic', {
+            env = {
+              api_key = os.getenv 'ANTHROPIC_KEY',
             },
-          },
-          env = {
-            url = 'http://ai.kdkvsk.com:11435',
-            api_key = 'e6674e8879f9473e8429631dfa7edec8',
-          },
-          headers = {
-            ['Content-Type'] = 'application/json',
-            ['Authorization'] = 'Bearer ${api_key}',
-          },
-          parameters = {
-            sync = true,
-          },
-        })
-      end,
+            schema = {
+              model = {
+                default = 'claude-sonnet-4-5-20250929',
+              },
+            },
+          })
+        end,
+        openai = function()
+          return require('codecompanion.adapters').extend('openai', {
+            env = {
+              api_key = os.getenv 'OPENAI_KEY',
+            },
+            schema = {
+              model = {
+                default = 'gpt-5',
+              },
+            },
+          })
+        end,
+      },
     },
   },
   keys = {
