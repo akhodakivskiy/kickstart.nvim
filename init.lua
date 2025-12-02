@@ -120,6 +120,9 @@ end)
 
 -- Enable break indent
 vim.o.breakindent = true
+--
+-- Always expand tabs
+vim.o.expandtab = true
 
 -- Save undo history
 vim.o.undofile = true
